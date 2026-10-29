@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr-CA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier — Génération, cartes et fonds d’écran</title>
+<link rel="icon" type="image/png" sizes="256x256" href="https://raw.githubusercontent.com/5236fido/avatars/main/media/avatar-favicon-256.png">
+<style>
+@font-face{font-family:"Oh Chewy Custom";src:url("https://raw.githubusercontent.com/5236fido/avatars/main/media/oh-chewy.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"Gill Sans Custom";src:url("https://raw.githubusercontent.com/5236fido/avatars/main/media/gill-sans.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"Mystical Spring Custom";src:url("https://raw.githubusercontent.com/5236fido/avatars/main/media/mystical-spring.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"Creato Display Custom";src:url("https://raw.githubusercontent.com/5236fido/avatars/main/media/creato-display.otf") format("opentype");font-display:swap}
+@font-face{font-family:"Erbaum Bold Custom";src:url("https://raw.githubusercontent.com/5236fido/avatars/main/media/Erbaum-Bold.ttf") format("truetype");font-display:swap}
+@font-face{font-family:"Ted Next Semibold";src:url("https://raw.githubusercontent.com/rogersrepaccess/repaccess-fr/main/fonts/TedNext-Semibold.woff") format("woff");font-display:swap}
+@font-face{font-family:"Bebas Neue Custom";src:url("https://raw.githubusercontent.com/5236fido/avatars/main/media/Bebas-Neue.ttf") format("truetype");font-display:swap}
+
+:root{color-scheme:light;--ink:#1f2430;--sub:#637083;--accent:#DA291C;--paper:#fff;--bg:#f3f5f8;--stroke:#dde2e9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:#fff;border-bottom:1px solid var(--stroke);padding:22px clamp(18px,4vw,54px)}
+header h1{font-size:25px;margin:0 0 4px;letter-spacing:-.6px}header p{color:var(--sub);margin:0;font-size:14px}
+.layout{max-width:1280px;display:grid;grid-template-columns:minmax(315px,460px) minmax(340px,1fr);gap:24px;margin:26px auto;padding:0 22px 35px}
+.panel{background:white;border:1px solid var(--stroke);border-radius:16px;padding:22px;box-shadow:0 7px 22px #1e293b08}
+.panel h2{font-size:17px;margin:0 0 16px}.section{padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid var(--stroke)}.section:last-child{padding:0;margin:0;border:0}
+label{display:block;font-size:13px;font-weight:680;margin-bottom:8px}.field{width:100%;padding:12px 13px;border:1px solid #cfd6df;border-radius:10px;font:inherit;background:white;color:var(--ink)}.field:focus{outline:2px solid #cfadb4;border-color:var(--accent)}.formrow{margin-top:15px}
+.drop{border:2px dashed #b8c3d1;border-radius:13px;background:#fafbfc;padding:24px 12px;text-align:center;transition:.15s;cursor:pointer}.drop.over,.drop:focus{background:#fff2f3;border-color:var(--accent);outline:none}.drop strong{display:block;margin:8px 0 3px;font-size:15px}.drop span{color:var(--sub);font-size:12px}
+.btn{background:#f5f6f8;color:var(--ink);border:1px solid #cad1da;border-radius:9px;padding:10px 14px;font-weight:650;cursor:pointer;font:inherit}.btn:hover{filter:brightness(.97)}.btn.primary{background:var(--accent);color:white;border-color:var(--accent)}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.wide{width:100%;padding:13px}
+.sliderline{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:16px 0 8px;font-size:13px}.sliderline strong{font-variant-numeric:tabular-nums;color:var(--sub);font-size:12px}input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer;margin:0}
+.actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:16px}.preview-panel{display:flex;align-items:center;flex-direction:column;gap:14px;position:sticky;top:20px;align-self:start}.preview-head{display:flex;align-items:center;justify-content:space-between;width:100%}.preview-head h2{margin:0}.chip{font-size:12px;color:var(--sub);border:1px solid var(--stroke);border-radius:99px;padding:5px 9px}.canvas-wrap{background:#e9ecf1;border:1px solid #dfe3eb;border-radius:13px;padding:20px;display:flex;justify-content:center;align-items:center;width:100%;min-height:300px}canvas{display:block;width:min(100%,450px);aspect-ratio:5/7;height:auto;background:transparent;border-radius:10px;box-shadow:0 15px 32px #0002}.hint{font-size:12px;color:var(--sub);line-height:1.5;margin:0}.swatches{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}.swatches span{width:25px;height:25px;border-radius:50%;border:1px solid #0002;box-shadow:0 1px 3px #0002}.foot{text-align:center;font-size:12px;color:var(--sub);padding:5px 10px 24px}.hidden{display:none!important}
+.highlight{padding:18px;border-radius:15px;background:linear-gradient(135deg,#fff 0%,#faf6f6 100%);border:1px solid #ead7d7;box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.highlight h2{margin:0 0 8px;font-size:18px}.highlight p{margin:0 0 14px;font-size:12px;color:var(--sub)}
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.style-chip{display:flex;align-items:center;gap:10px;border:1px solid #d8dee7;background:#fff;border-radius:12px;padding:9px 10px;min-height:54px}.style-chip input{margin:0}.style-chip strong{display:block;font-size:14px}.style-chip span{display:block;font-size:11px;color:var(--sub);line-height:1.3}.mini{width:26px;height:32px;border-radius:6px;border:1px solid #0001;box-shadow:inset 0 0 0 1px #ffffff40,0 1px 2px #0001;flex:0 0 auto}
+@media(max-width:800px){.layout{grid-template-columns:1fr;margin-top:14px;padding:0 14px}.preview-panel{position:static;grid-row:1}.panel{padding:17px}.canvas-wrap{padding:13px}canvas{width:min(100%,330px)}header{padding:17px}.style-grid{grid-template-columns:1fr}}
+
+/* Navigation globale : les trois fonctions du programme */
+.global-nav{background:#fff;border-bottom:1px solid var(--stroke);padding:22px clamp(18px,4vw,54px) 20px}
+.global-nav-inner{max-width:1280px;margin:0 auto}
+.global-nav-label{font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#7b8491;margin:0 0 12px}
+.global-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.global-tab{appearance:none;min-height:88px;border:1px solid #d9dfe8;border-radius:15px;padding:18px 18px 17px;text-align:left;display:flex;gap:14px;align-items:center;background:#f8f9fb;color:#303744;font:inherit;font-weight:730;font-size:17px;letter-spacing:-.025em;cursor:pointer;transition:background .16s,border-color .16s,box-shadow .16s}
+.global-tab:hover{background:#f1f4f8;border-color:#abb8c8}
+.global-tab[aria-selected="true"]{background:#fff;border-color:#364152;box-shadow:inset 0 0 0 1px #364152,0 6px 17px #1e293b13;color:#111827}
+.global-tab:focus-visible{outline:3px solid #7ea9ed;outline-offset:3px}
+.global-tab .tab-number{display:flex;justify-content:center;align-items:center;border-radius:11px;background:#e6eaf0;width:40px;height:40px;flex:none;font-size:16px}
+.global-tab[aria-selected="true"] .tab-number{background:#293548;color:#fff}
+.function-placeholder{max-width:1000px;margin:38px auto;padding:0 22px 50px}
+.placeholder-card{background:#fff;border:1px solid var(--stroke);border-radius:20px;padding:clamp(32px,7vw,75px);min-height:365px;display:flex;align-items:center;flex-direction:column;justify-content:center;text-align:center;box-shadow:0 8px 25px #1e293b08}
+.placeholder-icon{width:68px;height:68px;border-radius:21px;background:#eff2f6;display:grid;place-items:center;margin-bottom:20px;color:#44536a}
+.placeholder-card h2{font-size:clamp(23px,3vw,30px);letter-spacing:-.04em;margin:0 0 10px}
+.placeholder-card p{max-width:510px;color:var(--sub);line-height:1.6;margin:0}
+.tab-panel[hidden]{display:none!important}
+@media(max-width:850px){.global-nav{padding:16px 14px}.global-tabs{gap:8px}.global-tab{padding:13px 10px;min-height:76px;font-size:13px;gap:8px}.global-tab .tab-number{width:28px;height:28px;font-size:13px}.function-placeholder{margin:20px auto}}
+@media(max-width:620px){.global-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.global-tab{flex-direction:column;align-items:flex-start;justify-content:center;min-height:105px;font-size:12px}}
+
+/* Onglet 1 : guide de génération du personnage */
+.character-layout{max-width:1350px;margin:28px auto 54px;padding:0 22px;display:grid;grid-template-columns:minmax(0,65fr) minmax(0,35fr);gap:24px;align-items:start}
+.character-left,.example-card{border:1px solid var(--stroke);border-radius:18px;background:#fff;box-shadow:0 7px 22px #1e293b08}
+.character-left{padding:clamp(22px,3.2vw,42px)}.character-intro{padding-bottom:26px;border-bottom:1px solid #e7eaf0}.eyebrow{font-size:11px;letter-spacing:.13em;color:#66758b;font-weight:800;margin-bottom:12px}.character-intro h1{font-size:clamp(24px,3vw,32px);line-height:1.2;letter-spacing:-.045em;margin:0 0 13px}.character-intro p{font-size:15px;color:#596579;line-height:1.7;margin:0;max-width:720px}
+.character-steps{margin:0;padding:0;list-style:none}.character-step{display:grid;grid-template-columns:49px minmax(0,1fr);gap:16px;padding:26px 0;border-bottom:1px solid #ebedf1}.character-step:last-child{border-bottom:none}.step-index{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:#eef1f5;color:#34465c;font-weight:800;font-size:14px}.character-step h2{font-size:18px;letter-spacing:-.025em;margin:1px 0 9px}.character-step p{font-size:14px;line-height:1.65;color:#576477;margin:0 0 12px}.character-step p:last-child{margin-bottom:0}.tip-line{font-size:12px;color:#637187;background:#f5f7fa;padding:10px 12px;border-radius:8px;display:inline-flex;gap:8px;align-items:center}.tip-line span{color:#298e88}.character-download{display:inline-flex;gap:10px;align-items:center;background:#253548;color:#fff;text-decoration:none;padding:12px 17px;border-radius:10px;font-weight:700;font-size:13px;margin:5px 0 0}.character-download:hover{background:#354e68}.character-download:focus-visible{outline:3px solid #88baf8;outline-offset:3px}.guide-status{min-height:0;color:#536478;font-size:12px!important;margin:8px 0 0!important}.guide-status:empty{display:none}.attachment-summary{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 18px}.attachment-summary>div{display:flex;align-items:center;gap:10px;background:#f6f8fa;border:1px solid #e5e9ef;border-radius:10px;padding:11px 13px;flex:1;min-width:165px}.attachment-summary strong,.attachment-summary small{display:block}.attachment-summary strong{font-size:13px}.attachment-summary small{font-size:11px;color:#7a8795;margin-top:3px}.attachment-icon{font-size:22px;color:#51677d}.sample-prompt{border:1px solid #dbe2eb;background:#f8fafc;border-radius:11px;display:flex;align-items:center;justify-content:space-between;padding:10px 10px 10px 17px;gap:12px}.sample-prompt code{font-size:16px;font-weight:700;color:#24344b}.sample-prompt button{font:inherit;font-size:12px;font-weight:700;cursor:pointer;background:#fff;border:1px solid #ced8e3;border-radius:8px;padding:8px 12px}.tip-after{font-size:12px!important;margin-top:10px!important}.character-next{border-radius:12px;background:#f0f7f5;display:flex;gap:13px;align-items:flex-start;padding:16px 18px;color:#275e51}.character-next>span{background:#d0ece2;border-radius:50%;padding:3px 7px;font-weight:800}.character-next p{margin:0;line-height:1.6;font-size:13px}
+.character-right{position:sticky;top:20px;min-width:0}.example-card{padding:19px}.example-heading{display:flex;gap:11px;align-items:flex-start;margin:0 0 15px}.example-dot{width:9px;height:9px;border-radius:50%;background:#238e88;margin-top:6px;flex:none}.example-heading strong{font-size:15px}.example-heading p{margin:4px 0 0;color:#677488;font-size:12px;line-height:1.5}.example-image{display:block;width:100%;height:auto;border:1px solid #e4e8ed;border-radius:10px;box-shadow:0 2px 12px #1018280a}.example-caption{color:#7a8795;text-align:center;font-size:11px;margin:11px 0 0}
+@media(max-width:880px){.character-layout{grid-template-columns:1fr}.character-right{position:static}.example-card{max-width:600px;margin:0 auto}.character-layout{padding:0 14px;margin:18px auto 32px}}@media(max-width:480px){.character-step{grid-template-columns:36px minmax(0,1fr);gap:10px}.step-index{width:34px;height:34px;font-size:12px}.character-left{padding:18px}.character-step h2{font-size:16px}}
+
+/* Onglet 3 : composition du fond d'écran */
+.group-layout{max-width:1600px;padding:0 22px 50px;margin:26px auto;display:grid;grid-template-columns:minmax(330px,410px) minmax(0,1fr);align-items:start;gap:22px}
+.group-controls h3{font-size:15px;letter-spacing:-.02em;margin:0 0 13px}.group-controls .section{padding:21px 0;margin:0}.group-controls .section:last-child{padding-bottom:0}.group-intro{padding-bottom:17px}.group-intro h2{font-size:24px;letter-spacing:-.04em;margin:4px 0 8px}.group-intro p{font-size:13px;line-height:1.6;color:var(--sub);margin:0}.group-kicker{color:#7c8491;font-weight:800;letter-spacing:.15em;font-size:10px}.group-section-title{display:flex;justify-content:space-between;align-items:center}.group-section-note{font-size:11px;color:var(--sub)}.group-count{font-size:12px;border-radius:40px;background:#f0f3f7;border:1px solid #dfe5ec;padding:4px 10px;color:#536174;font-weight:700}
+.group-drop{padding:22px 14px}.group-drop-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;margin:auto;background:#e9edf4;color:#3c4a63;font-size:28px}.group-drop small{font-size:11px;color:#8992a1;display:block;margin-top:8px}.group-info{margin-top:10px}.group-list{display:flex;flex-direction:column;gap:9px;max-height:520px;overflow:auto}.group-empty-list{border:1px dashed #d4dce7;border-radius:10px;text-align:center;color:#8c95a3;font-size:12px;padding:25px 12px}.group-item{display:grid;grid-template-columns:24px 48px minmax(0,1fr) auto;gap:9px;align-items:center;background:#fafbfc;border:1px solid #dfe5ec;border-radius:11px;padding:8px;cursor:grab}.group-item.drag-over{border-color:var(--accent);background:#f2f6fa}.group-item:active{cursor:grabbing}.group-grip{font-size:20px;color:#a2acb9;text-align:center}.group-thumb{width:45px;height:58px;object-fit:contain;background:repeating-conic-gradient(#e8ebef 0 25%,#fff 0 50%) 50%/12px 12px;border-radius:5px}.group-item-name{font-size:12px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}.group-item-order{font-size:11px;color:var(--sub);margin-top:4px}.group-buttons{display:flex;gap:3px}.group-mini-btn{border:1px solid #dce2ea;background:white;border-radius:7px;cursor:pointer;min-width:25px;height:28px;font-size:12px;color:#4b5a6b}.group-mini-btn:hover:not(:disabled){background:#ecf1f6}.group-mini-btn:disabled{opacity:.3;cursor:default}.group-remove{color:#a83b40}.group-clear{font-size:12px;margin-top:12px}.group-background-row{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid #e1e6ed;background:#fafbfc;border-radius:10px}.group-background-row strong{display:block;font-size:12px}.group-background-row small{display:block;font-size:11px;color:var(--sub);margin-top:4px}.group-background-row .btn{font-size:12px;padding:9px 10px;white-space:nowrap}.group-export-info{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:3px 0 14px;color:#6d7788;font-size:12px}.group-export-info strong{color:var(--ink);font-size:13px}.group-preview-panel{align-self:start;position:sticky;top:16px;gap:16px;display:flex;flex-direction:column}.group-preview-panel .preview-head h2{margin:0}.group-preview-wrap{border:1px solid #dbe1e9;border-radius:13px;background:#e9edf2;padding:14px;width:100%;display:flex;align-items:center;justify-content:center}.group-preview-wrap canvas{width:100%;max-width:none;aspect-ratio:3840/1914;border-radius:0;height:auto;box-shadow:0 10px 22px #0002}.group-preview-foot{display:flex;gap:15px;justify-content:space-between;color:var(--sub);font-size:11px;line-height:1.6}.group-preview-foot span:first-child{max-width:75%}
+@media(max-width:1060px){.group-layout{grid-template-columns:1fr}.group-preview-panel{position:static;grid-row:1}.group-preview-wrap{padding:8px}}@media(max-width:520px){.group-layout{padding:0 12px 28px;gap:12px}.group-buttons{flex-wrap:wrap;max-width:68px}.group-item{grid-template-columns:18px 42px minmax(0,1fr) auto}.group-thumb{width:40px;height:54px}}
+
+/* Liste de cartes en bande horizontale, directement sous l’aperçu. */
+.group-preview-panel{position:static}
+.group-order-section{width:100%;border-top:1px solid var(--stroke);padding-top:18px}
+.group-order-section h3{font-size:15px;margin:0 0 13px}
+.group-list{display:flex;flex-direction:row;gap:10px;overflow-x:auto;overflow-y:hidden;max-height:none;padding:4px 2px 12px;scrollbar-width:thin;min-width:0}
+.group-item{display:flex;flex-direction:column;align-items:stretch;flex:0 0 124px;width:124px;gap:6px;text-align:center;position:relative;cursor:grab;padding:9px}
+.group-grip{position:absolute;right:8px;top:4px;font-size:17px}
+.group-thumb{width:100%;height:130px;object-fit:contain;margin-top:7px}
+.group-item-name{max-width:100%;font-size:11px}.group-item-order{margin-top:2px}
+.group-buttons{justify-content:center;margin-top:auto}.group-mini-btn{min-width:29px}
+.group-empty-list{width:100%;min-width:200px}
+@media(max-width:520px){.group-item{flex:0 0 108px;width:108px}.group-thumb{width:100%;height:105px}.group-buttons{max-width:none;flex-wrap:nowrap}.group-order-section .group-section-note{font-size:10px;text-align:right}}
+
+/* Vignettes réorganisées en direct pendant le glissement. */
+.group-list.sorting{background:linear-gradient(90deg,#f4f7fb,#eef3fb);border-radius:12px;outline:1px dashed #c5d2e4;outline-offset:3px;min-height:230px}
+.group-item{user-select:none;transition:background-color .15s,border-color .15s,box-shadow .15s}
+.group-item.is-dragging{opacity:.28;border:2px dashed var(--accent);background:color-mix(in srgb,var(--accent) 9%,white);box-shadow:inset 0 0 0 2px #fff;transform:none!important}
+.group-list.sorting .group-item:not(.is-dragging){box-shadow:0 3px 9px #1f29370c}
+.group-grip{cursor:grab}.group-item.is-dragging .group-grip{cursor:grabbing}
+.drag-ghost{z-index:9999;opacity:.94;transform:rotate(2deg) scale(1.04);box-shadow:0 20px 42px #0003!important;border:2px solid var(--accent)!important;pointer-events:none}
+
+.hof-section{width:100%;border-top:1px solid var(--stroke);padding-top:18px}
+.hof-section h3{font-size:15px;margin:0}
+.hof-drop{padding:13px;border:1.5px dashed #aab5c6;border-radius:11px;background:#f8fafc;cursor:pointer;text-align:center;min-height:55px;display:flex;align-items:center;justify-content:center;color:#48556a;font-weight:650;font-size:13px;margin:11px 0}
+.hof-drop.over{background:#eaf4ff;border-color:#4476ad}
+.hof-size-control{margin:2px 0 14px}.hof-size-control .sliderline{margin:5px 0 9px}.hof-list{display:flex;gap:10px;overflow-x:auto;padding:8px 2px 10px;scrollbar-width:thin}
+.hof-item{flex:0 0 98px;position:relative;background:#fafbfc;border:1px solid #dfe5ec;border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:5px;text-align:center}
+.hof-item img{height:96px;width:100%;object-fit:contain}
+.hof-item small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}
+.hof-item button{border:1px solid #e2d6d6;background:#fff;color:#aa3442;border-radius:6px;cursor:pointer;font-size:11px;padding:4px}
+
+/* Tutoriel Chrome : instruction à gauche, capture à droite */
+.chrome-guide{max-width:1220px;margin:28px auto 64px;padding:0 22px}
+.chrome-intro{background:#fff;border:1px solid var(--stroke);border-radius:18px;padding:32px 36px;margin-bottom:18px;box-shadow:0 5px 18px #1e293b07}
+.chrome-eyebrow{font-weight:800;letter-spacing:.14em;font-size:11px;color:#69798c}
+.chrome-intro h1{font-size:clamp(24px,3vw,33px);letter-spacing:-.045em;margin:12px 0}
+.chrome-intro p{margin:0;max-width:820px;color:#576477;line-height:1.65}
+.chrome-steps{display:grid;gap:13px}.chrome-step{display:grid;grid-template-columns:minmax(0,44fr) minmax(0,56fr);align-items:center;gap:18px;background:#fff;border:1px solid var(--stroke);border-radius:16px;padding:20px 24px;box-shadow:0 4px 15px #1e293b06}
+.chrome-step-copy{display:flex;align-items:flex-start;gap:18px}.chrome-number{background:#edf1f6;color:#304052;border-radius:11px;min-width:44px;height:44px;display:grid;place-items:center;font-weight:800;font-size:15px}.chrome-step-copy p{line-height:1.7;color:#364253;font-size:15px;margin:8px 0 0}
+.chrome-step-media{min-width:0;display:flex;align-items:center;justify-content:center}.chrome-step-media a{display:flex;justify-content:center;align-items:center;max-width:100%;border-radius:10px;overflow:hidden;background:#f4f6f8;border:1px solid #e9edf2;min-height:35px}.chrome-step-media img{display:block;max-width:100%;max-height:390px;width:auto;height:auto;object-fit:contain}.chrome-step-media .image-unavailable{display:none}.chrome-no-image{font-size:21px;color:#a8b4c3;border:1px solid #e8edf3;background:#fafbfc;width:48px;height:48px;display:grid;place-items:center;border-radius:12px}
+@media(max-width:700px){.chrome-step{grid-template-columns:1fr;padding:17px}.chrome-intro{padding:23px}.chrome-step-copy{gap:12px}}
+</style>
+</head>
+<body>
+<nav class="global-nav" aria-label="Fonctions du programme">
+ <div class="global-nav-inner">
+  <p class="global-nav-label">Fonctions du programme</p>
+  <div class="global-tabs" role="tablist" aria-label="Fonction active">
+   <button class="global-tab" type="button" role="tab" id="tab-personnage" aria-controls="panel-personnage" aria-selected="true" tabindex="0" data-tab="personnage"><span class="tab-number">1</span><span>Génération du personnage</span></button>
+   <button class="global-tab" type="button" role="tab" id="tab-carte" aria-controls="panel-carte" aria-selected="false" tabindex="-1" data-tab="carte"><span class="tab-number">2</span><span>Carte individuelle</span></button>
+   <button class="global-tab" type="button" role="tab" id="tab-groupe" aria-controls="panel-groupe" aria-selected="false" tabindex="-1" data-tab="groupe"><span class="tab-number">3</span><span>Fond d'écran de groupe</span></button>
+   <button class="global-tab" type="button" role="tab" id="tab-chrome" aria-controls="panel-chrome" aria-selected="false" tabindex="-1" data-tab="chrome"><span class="tab-number">4</span><span>Afficher dans Chrome</span></button>
+  </div>
+ </div>
+</nav>
+<section id="panel-personnage" class="tab-panel" role="tabpanel" aria-labelledby="tab-personnage">
+ <main class="character-layout">
+  <article class="character-left">
+   <div class="character-intro">
+    <div class="eyebrow">ÉTAPE 1 · PRÉPARATION</div>
+    <h1>Créez votre personnage avec l’IA</h1>
+    <p>Avant de concevoir votre carte individuelle, générez une image de votre personnage à partir de quelques photographies. Vous pouvez utiliser n’importe quel outil d’IA capable de générer des images; <strong>ChatGPT est recommandé</strong> pour ce travail.</p>
+   </div>
+   <ol class="character-steps">
+    <li class="character-step"><span class="step-index" aria-hidden="true">01</span><div><h2>Préparez 2 à 4 photos du sujet</h2><p>Choisissez des photos nettes prises sous différents angles. Pour une meilleure ressemblance, incluez au moins <strong>une vue de face</strong> et <strong>une vue de biais</strong>.</p><div class="tip-line"><span aria-hidden="true">✦</span> Privilégiez un visage bien éclairé et clairement visible.</div></div></li>
+    <li class="character-step"><span class="step-index" aria-hidden="true">02</span><div><h2>Téléchargez le guide d’instructions</h2><p>Ce document explique à l’IA comment créer l’image de votre personnage et présente les options d’uniformes.</p><a id="downloadAiGuide" class="character-download" href="https://raw.githubusercontent.com/5236fido/avatars/main/media/cartes-individuelles_image_guide-IA.pdf" download="Guide-IA-cartes-individuelles.pdf"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 17v3h16v-3"/></svg>Télécharger le guide PDF</a><p id="guideStatus" class="guide-status" aria-live="polite"></p></div></li>
+    <li class="character-step"><span class="step-index" aria-hidden="true">03</span><div><h2>Choisissez un uniforme</h2><p>Consultez les <strong>cinq uniformes numérotés de 1 à 5</strong> dans le guide téléchargé, puis choisissez celui que portera le personnage.</p></div></li>
+    <li class="character-step"><span class="step-index" aria-hidden="true">04</span><div><h2>Demandez à l’IA de créer l’image</h2><p>Ouvrez un nouveau clavardage avec l’IA et joignez les éléments suivants :</p><div class="attachment-summary"><div><span class="attachment-icon" aria-hidden="true">▧</span><span><strong>2 à 4 photos</strong><small>Images du sujet</small></span></div><div><span class="attachment-icon" aria-hidden="true">▤</span><span><strong>Guide PDF</strong><small>Document de l’étape 2</small></span></div></div><p>Dans le message, indiquez <strong>uniquement le numéro de l’uniforme choisi</strong>, par exemple :</p><div class="sample-prompt"><code>Uniforme #4</code><button type="button" id="copyUniform" aria-label="Copier l’exemple de message">Copier</button></div><p class="tip-after">Aucune autre instruction n’est nécessaire.</p></div></li>
+   </ol>
+   <div class="character-next"><span aria-hidden="true">✓</span><p>Une fois votre image générée et enregistrée, passez à l’onglet <strong>2. Carte individuelle</strong> pour créer votre carte.</p></div>
+  </article>
+  <aside class="character-right" aria-label="Exemple de demande à l’IA"><div class="example-card"><div class="example-heading"><span class="example-dot"></span><div><strong>Exemple de clavardage</strong><p>Voici comment présenter votre demande à l’IA.</p></div></div><a href="https://raw.githubusercontent.com/5236fido/avatars/main/media/exemple-clavardage-ia.png" target="_blank" rel="noopener noreferrer" title="Ouvrir l’image en grand"><img class="example-image" src="https://raw.githubusercontent.com/5236fido/avatars/main/media/exemple-clavardage-ia.png" alt="Exemple de conversation avec une IA montrant les pièces jointes et le message demandant un uniforme" loading="lazy"></a><p class="example-caption">Cliquez sur l’image pour l’agrandir.</p></div></aside>
+ </main>
+</section>
+<section id="panel-carte" class="tab-panel" role="tabpanel" aria-labelledby="tab-carte" hidden>
+
+<main class="layout">
+ <section class="panel controls" aria-label="Paramètres de la carte">
+  <div class="section highlight"><h2>Style de la carte</h2><p>Trois compositions distinctes. <strong>Baseball</strong> demeure le style par défaut.</p>
+   <div class="style-grid" id="styleGrid">
+    <label class="style-chip"><input type="radio" name="style" value="baseball" checked><div class="mini" style="background:#fff;border:4px solid #da291c"></div><div><strong>Baseball</strong><span>Classique sportive, lettrage expressif.</span></div></label>
+    <label class="style-chip"><input type="radio" name="style" value="editorial"><div class="mini" style="background:linear-gradient(to bottom,#b3b7bb 0 68%,#fcf9f3 68%);border-bottom:5px solid #da291c"></div><div><strong>Éditorial</strong><span>Portrait pleine page, typographie élégante.</span></div></label>
+    <label class="style-chip"><input type="radio" name="style" value="signature"><div class="mini" style="background:linear-gradient(to bottom,#da291c 0 17%,#d4d4d4 17% 73%,#da291c 73%)"></div><div><strong>Signature</strong><span>Composition graphique, moderne et affirmée.</span></div></label>
+   </div>
+  </div>
+
+  <div class="section"><h2>1. Photo de l’employé</h2>
+   <div id="drop" class="drop" role="button" tabindex="0" aria-label="Importer ou déposer une image"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#DA291C" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m4 17 5-5 4 4 3-3 4 4"/></svg><strong>Glissez votre photo ici</strong><span>ou cliquez pour parcourir les fichiers<br>JPG, PNG, WEBP, GIF (première image)</span></div>
+   <input id="upload" type="file" accept="image/*" class="hidden">
+   <p id="fileName" class="hint" style="margin-top:10px" aria-live="polite">Aucune photo importée.</p>
+  </div>
+  <div class="section"><h2>2. Thème de la carte</h2>
+   <label for="theme">Enseigne</label><select id="theme" class="field"><option value="rogers">Rogers</option><option value="fido">Fido</option><option value="chatr">Chatr</option></select>
+   <div id="swatches" class="swatches" aria-label="Palette du thème"></div>
+   
+  </div>
+  <div class="section"><h2>3. Textes de la carte</h2>
+   <div class="formrow"><label for="employee">Texte principal</label><input id="employee" class="field" maxlength="65" value="Prénom" placeholder="Ex. Timothée"></div>
+   <div class="formrow"><label for="position">Texte secondaire</label><input id="position" class="field" maxlength="80" value="Poste de l'employé" placeholder="Ex. Conseiller"></div>
+   <div class="sliderline"><label for="nameSize" style="margin:0">Taille du texte principal</label><strong id="nameSizeOut">85 %</strong></div><input id="nameSize" type="range" min="30" max="100" value="85" step="1">
+   <div class="sliderline"><label for="nameVertical" style="margin:0">Position verticale du texte principal</label><strong id="nameVerticalOut">0 px</strong></div><input id="nameVertical" type="range" min="-230" max="230" value="0" step="5" aria-describedby="nameVerticalHint"><p id="nameVerticalHint" class="hint" style="margin-top:5px">Valeur négative : remonter · Valeur positive : descendre</p>
+   
+   
+  </div>
+  <div class="section"><h2>4. Position et taille de la photo</h2>
+   <div class="sliderline"><label for="zoom" style="margin:0">Zoom</label><strong id="zoomOut">100 %</strong></div><input id="zoom" type="range" min="100" max="300" value="100" step="1">
+   <div class="sliderline"><label for="x" style="margin:0">Position horizontale</label><strong id="xOut">0 %</strong></div><input id="x" type="range" min="-100" max="100" value="0" step="1">
+   <div class="sliderline"><label for="y" style="margin:0">Position verticale</label><strong id="yOut">0 %</strong></div><input id="y" type="range" min="-100" max="100" value="0" step="1">
+   <div class="actions"><button class="btn" id="reset" type="button">Réinitialiser le cadrage</button></div>
+   
+  </div>
+  <div class="section"><h2>5. Exportation</h2><label for="resolution">Résolution de l’image</label><select id="resolution" class="field"><option value="1000">1000 × 1400 px</option><option value="2000">2000 × 2800 px</option></select>
+  <div style="margin-top:16px"><button id="export" class="btn primary wide" type="button" disabled>Télécharger la carte en PNG</button></div></div>
+ </section>
+ <section class="panel preview-panel" aria-label="Aperçu de la carte"><div class="preview-head"><h2>Aperçu</h2><span class="chip">Format 5:7</span></div><div class="canvas-wrap"><canvas id="preview" width="1000" height="1400" aria-label="Aperçu de la carte personnalisée"></canvas></div><p class="hint"></p></section>
+</main><footer class="foot">Traitement local des photos — connexion requise pour charger les polices personnalisées.</footer>
+</section>
+<section id="panel-groupe" class="tab-panel" role="tabpanel" aria-labelledby="tab-groupe" hidden>
+ <main class="group-layout">
+  <section class="panel group-controls">
+   <div class="group-intro"><span class="group-kicker">COMPOSITION D’ÉQUIPE</span><h2>Fond d’écran de groupe</h2><p>Présentoir de 10 cartes maximum.</p></div>
+   <div class="section"><div class="group-section-title"><h3>1. Importer les cartes</h3><span id="groupCounter" class="group-count">0 / 10</span></div>
+    <div id="groupDrop" class="drop group-drop" role="button" tabindex="0"><span class="group-drop-icon">＋</span><strong>Ajouter des cartes</strong><span>Glissez jusqu’à 10 images ou cliquez pour les sélectionner.</span><small>PNG avec coins transparents recommandé.</small></div>
+    <input id="groupUpload" type="file" accept="image/png,image/jpeg,image/webp,image/*" multiple hidden>
+    <p id="groupImportMessage" class="hint group-info" role="status"></p>
+   </div>
+   <div class="section"><h3>2. Arrière-plan</h3><p class="hint"></p>
+    <div class="group-background-row"><div><strong id="groupBackgroundStatus">Chargement du décor…</strong><small id="groupBackgroundDetail">Image officielle depuis GitHub</small></div><button type="button" class="btn" id="groupBackgroundButton">Importer un fond</button></div>
+    <input id="groupBackgroundInput" type="file" accept="image/*" hidden>
+    
+   </div>
+   <div class="section"><h3>3. Exporter</h3><div class="group-export-info"><span>PNG haute résolution</span><strong>3840 × 1914 px</strong></div><button type="button" class="btn primary wide" id="groupExport" disabled>Exporter le fond d’écran PNG</button><p id="groupExportStatus" class="hint" role="status" style="margin-top:10px"></p></div>
+  </section>
+  <section class="panel group-preview-panel"><div class="preview-head"><h2>Aperçu en direct</h2><span class="chip">3840 × 1914</span></div>
+    <div class="group-preview-wrap"><canvas id="groupCanvas" width="3840" height="1914" aria-label="Aperçu du fond d’écran de groupe"></canvas></div>
+    <div class="group-preview-foot"><span>Cartes orientées vers le centre</span><span>Dimensions d’export exactes</span></div>
+    <div class="hof-section">
+      <div class="group-section-title"><h3>Hall of fame</h3><span id="hofCounter" class="group-count">0 / 5</span></div>
+      <div id="hofDrop" class="hof-drop" role="button" tabindex="0">＋ Ajouter des cartes au Hall of fame</div>
+      <div class="hof-size-control"><div class="sliderline"><label for="hofSize" style="margin:0">Taille des cartes</label><strong id="hofSizeOut">255 px</strong></div><input id="hofSize" type="range" min="75" max="370" value="255" step="5" disabled></div>
+      <input id="hofUpload" type="file" accept="image/*" multiple hidden>
+      <div id="hofList" class="hof-list"></div>
+      <p id="hofStatus" class="hint" role="status"></p>
+    </div>
+    <div class="group-order-section"><div class="group-section-title"><h3>Ordre des cartes</h3><span class="group-section-note">De gauche à droite</span></div>
+      <div id="groupList" class="group-list" aria-live="polite"><div class="group-empty-list">Les cartes importées apparaîtront ici.</div></div>
+      <button type="button" class="btn group-clear" id="groupClear" disabled>Retirer toutes les cartes</button>
+    </div>
+  </section>
+ </main>
+</section>
+<section id="panel-chrome" class="tab-panel" role="tabpanel" aria-labelledby="tab-chrome" hidden>
+ <main class="chrome-guide"><div class="chrome-intro"><span class="chrome-eyebrow">GUIDE PRATIQUE</span><h1>Afficher le fond d’écran dans Chrome</h1><p>Voici comment configurer votre fond d’écran dans Chrome sur un ordinateur aux autorisations restreintes, comme ceux de Rogers.</p></div><div class="chrome-steps"><article class="chrome-step"><div class="chrome-step-copy"><span class="chrome-number">01</span><p>Après avoir téléchargé le fond d’écran, ouvrez les « Téléchargements récents » dans Chrome et cliquez sur le fichier pour l’ouvrir.</p></div><div class="chrome-step-media"><a href="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-1.png" target="_blank" rel="noopener noreferrer" aria-label="Agrandir l’illustration de l’étape 1"><img loading="lazy" src="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-1.png" alt="Capture d’écran de l’étape 1" onerror="this.closest('a').classList.add('image-unavailable')"></a></div></article><article class="chrome-step"><div class="chrome-step-copy"><span class="chrome-number">02</span><p>Une fois le fichier ouvert, faites un clic droit, puis choisissez « Copier en tant que chemin d’accès ».</p></div><div class="chrome-step-media"><a href="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-2.png" target="_blank" rel="noopener noreferrer" aria-label="Agrandir l’illustration de l’étape 2"><img loading="lazy" src="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-2.png" alt="Capture d’écran de l’étape 2" onerror="this.closest('a').classList.add('image-unavailable')"></a></div></article><article class="chrome-step"><div class="chrome-step-copy"><span class="chrome-number">03</span><p>Ouvrez une nouvelle fenêtre Chrome.</p></div><div class="chrome-step-media"><div class="chrome-no-image" aria-hidden="true"><span>✓</span></div></div></article><article class="chrome-step"><div class="chrome-step-copy"><span class="chrome-number">04</span><p>Dans le coin inférieur droit de la nouvelle fenêtre, cliquez sur « Personnaliser Chrome » (icône de crayon).</p></div><div class="chrome-step-media"><a href="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-3.png" target="_blank" rel="noopener noreferrer" aria-label="Agrandir l’illustration de l’étape 4"><img loading="lazy" src="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-3.png" alt="Capture d’écran de l’étape 4" onerror="this.closest('a').classList.add('image-unavailable')"></a></div></article><article class="chrome-step"><div class="chrome-step-copy"><span class="chrome-number">05</span><p>Dans le panneau latéral, cliquez sur « Modifier le thème ».</p></div><div class="chrome-step-media"><a href="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-4.png" target="_blank" rel="noopener noreferrer" aria-label="Agrandir l’illustration de l’étape 5"><img loading="lazy" src="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-4.png" alt="Capture d’écran de l’étape 5" onerror="this.closest('a').classList.add('image-unavailable')"></a></div></article><article class="chrome-step"><div class="chrome-step-copy"><span class="chrome-number">06</span><p>Sélectionnez « Importer une image ».</p></div><div class="chrome-step-media"><a href="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-5.png" target="_blank" rel="noopener noreferrer" aria-label="Agrandir l’illustration de l’étape 6"><img loading="lazy" src="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-5.png" alt="Capture d’écran de l’étape 6" onerror="this.closest('a').classList.add('image-unavailable')"></a></div></article><article class="chrome-step"><div class="chrome-step-copy"><span class="chrome-number">07</span><p>Si un ou deux messages d’erreur indiquent que vous ne disposez pas des autorisations nécessaires pour accéder aux fichiers de l’ordinateur, cliquez sur « OK ».</p></div><div class="chrome-step-media"><div class="chrome-no-image" aria-hidden="true"><span>✓</span></div></div></article><article class="chrome-step"><div class="chrome-step-copy"><span class="chrome-number">08</span><p>Dans le champ de saisie, collez le chemin d’accès copié à l’étape 2, puis validez.</p></div><div class="chrome-step-media"><a href="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-6.png" target="_blank" rel="noopener noreferrer" aria-label="Agrandir l’illustration de l’étape 8"><img loading="lazy" src="https://raw.githubusercontent.com/5236fido/avatars/main/media/tutoriel-6.png" alt="Capture d’écran de l’étape 8" onerror="this.closest('a').classList.add('image-unavailable')"></a></div></article></div></main>
+</section>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const W=3840,H=1914,TOP=175,BOTTOM=126,RESERVE_W=1067,RESERVE_H=768,ROW_H=710,ROW_W=W*.92;
+const scene={cards:[],hof:[],background:null,urls:[],dragging:null};
+const cvs=$('groupCanvas'),ctx=cvs.getContext('2d');
+const officialURL='https://raw.githubusercontent.com/5236fido/avatars/main/media/arriere-plan_fond-ecran.png';
+function loadBackground(){const img=new Image();img.crossOrigin='anonymous';img.onload=()=>{scene.background=img;$('groupBackgroundStatus').textContent='Décor officiel chargé';$('groupBackgroundDetail').textContent='Image de fond prête pour l’exportation';redraw()};img.onerror=()=>{$('groupBackgroundStatus').textContent='Décor indisponible';$('groupBackgroundDetail').textContent='Importez le fond avec le bouton ci-contre';redraw()};img.src=officialURL;}
+function imageCover(c,img,x,y,w,h){const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height,ratio=Math.max(w/iw,h/ih),dw=ratio*iw,dh=ratio*ih;c.drawImage(img,x+(w-dw)/2,y+(h-dh)/2,dw,dh)}
+function backgroundFallback(c){const g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,'#463731');g.addColorStop(.7,'#786354');g.addColorStop(1,'#ad8870');c.fillStyle=g;c.fillRect(0,0,W,H);c.fillStyle='#ffffff11';for(let x=0;x<W;x+=120){c.fillRect(x,0,3,H)}const wood=c.createLinearGradient(0,1600,0,H);wood.addColorStop(0,'#bd9574');wood.addColorStop(1,'#6f4a34');c.fillStyle=wood;c.fillRect(0,1610,W,304)}
+function calcGeometry(n){const h=Math.min(ROW_H,680);const w=h*5/7;const occupied=n===1?w:Math.min(ROW_W,n*w*1.04);const step=n<=1?0:(occupied-w)/(n-1);return {h,w,step,start:(W-occupied)/2,baseline:H-BOTTOM,center:(n-1)/2}}
+// Perspective simulée par projection 3D en colonnes : aucune rotation dans le plan XY.
+// Le bord orienté vers le centre est plus proche de l’observateur et donc plus grand.
+function drawYawCard(c,img,cx,bottom,w,h,yaw){
+ const f=2600, depth=1000, cos=Math.cos(yaw),sin=Math.sin(yaw);
+ const projected=(u)=>{const local=u-w/2;const z=depth-local*sin;const scale=f/(f+z-depth);return {x:local*cos*scale,yScale:scale}};
+ const left=projected(0),right=projected(w);
+ // Ancre les deux coins inférieurs à la même ligne pour simuler des cartes debout.
+ c.save();
+ // Une seule ombre portée sous la silhouette : évite les coutures sombres entre bandes.
+ c.save();c.shadowColor='rgba(0,0,0,.37)';c.shadowBlur=25;c.shadowOffsetY=12;
+ c.beginPath();c.moveTo(cx+left.x,bottom);c.lineTo(cx+left.x,bottom-h*left.yScale);
+ c.lineTo(cx+right.x,bottom-h*right.yScale);c.lineTo(cx+right.x,bottom);
+ c.closePath();c.fillStyle='rgba(20,20,20,.10)';c.fill();c.restore();
+ const steps=140, strip=w/steps;
+ for(let j=0;j<steps;j++){
+  const u0=j*strip,u1=(j+1)*strip;
+  const a=projected(u0),b=projected(u1);
+  const dw=b.x-a.x;
+  // Par bande, la hauteur varie selon la profondeur; bas aligné.
+  const height=h*((a.yScale+b.yScale)/2);
+  if(dw>0)c.drawImage(img,u0/w*(img.naturalWidth||img.width),0,Math.min((strip+.45)/w*(img.naturalWidth||img.width),(img.naturalWidth||img.width)-u0/w*(img.naturalWidth||img.width)),img.naturalHeight||img.height,cx+a.x,bottom-height,dw+.7,height);
+ }
+ c.restore();
+}
+// Vitrine des employés distingués : zone 1067 × 768, sans recouvrir la rangée principale.
+// The available width is shared between all cards. Rotation and <=15% overlap
+// are included so a size increase cannot make the cards leave the frame.
+function hallMaxWidth(count){
+ if(!count)return 370;
+ const frameInnerWidth=RESERVE_W-52-65; // 65 px of breathing room
+ const overlaps=({1:0,2:0,3:.06,4:.105,5:.145})[count];
+ const rotationAllowance=.18; // bounds of rotations up to 7.5°
+ const maxByWidth=frameInnerWidth/(count-(count-1)*overlaps+rotationAllowance);
+ return Math.max(75,Math.min(370,Math.floor(maxByWidth/5)*5));
+}
+function updateHallSizeControl(){
+ const control=$('hofSize');
+ const maximum=hallMaxWidth(scene.hof.length);
+ control.max=String(maximum);
+ if(+control.value>maximum)control.value=String(maximum);
+ control.disabled=scene.hof.length===0;
+ $('hofSizeOut').textContent=control.value+' px';
+}
+function drawHall(c){
+ // The entire Hall of fame, including its title, moves 60 px inward.
+ const x=W-RESERVE_W-60,y=TOP,w=RESERVE_W,h=RESERVE_H;
+ const n=scene.hof.length;
+ if(!n)return;
+ c.save();
+ const inset=26, bx=x+inset, by=y+29, bw=w-2*inset, bh=h-58, r=34;
+ const title='Hall of fame';c.font='600 67px "Ted Next Semibold", Arial, sans-serif';
+ const tw=Math.min(w-155,c.measureText(title).width+48),ty=by;
+ // Keep the top stroke interrupted behind the centered title.
+ c.save();c.beginPath();c.rect(0,0,x+w/2-tw/2,H);c.rect(x+w/2+tw/2,0,W-(x+w/2+tw/2),H);c.rect(x+w/2-tw/2,by+12,tw,H-(by+12));c.clip();
+ c.beginPath();c.roundRect(bx,by,bw,bh,r);
+ c.lineWidth=5;c.strokeStyle='rgba(255,255,255,.95)';
+ c.shadowColor='rgba(0,0,0,.42)';c.shadowBlur=9;c.shadowOffsetY=2;c.stroke();c.restore();
+ c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';
+ c.shadowColor='rgba(0,0,0,.75)';c.shadowBlur=9;c.shadowOffsetY=2;
+ c.fillText(title,x+w/2,ty,w-145);
+ c.shadowBlur=0;c.shadowOffsetY=0;
+ // One to five cards, with more breathing room when fewer are shown.
+ const cw=Math.min(+$('hofSize').value,hallMaxWidth(n));
+ const ch=cw*7/5;
+ const overlapRate=({1:0,2:0,3:.06,4:.105,5:.145})[n];
+ const overlap=cw*overlapRate;
+ const span=cw*n-overlap*(n-1);
+ const startX=x+(w-span)/2;
+ const angles=[-7.5,4,-3,6.5,-5.5];
+ const shifts=[8,-7,5,-5,7];
+ // Keep oversized cards centered vertically inside the Hall boundary.
+ const centerY=(by+132+by+bh-36)/2;
+ for(let i=0;i<n;i++){
+  const cx=startX+cw/2+i*(cw-overlap),cy=centerY+shifts[i];
+  c.save();c.translate(cx,cy);c.rotate(angles[i]*Math.PI/180);
+  c.shadowColor='rgba(0,0,0,.42)';c.shadowBlur=18;c.shadowOffsetY=9;
+  c.drawImage(scene.hof[i].img,-cw/2,-ch/2,cw,ch);
+  c.restore();
+ }
+ c.restore();
+}
+function redraw(){ctx.clearRect(0,0,W,H);if(scene.background)imageCover(ctx,scene.background,0,0,W,H);else backgroundFallback(ctx);
+ drawHall(ctx);
+ const n=scene.cards.length;if(n){const g=calcGeometry(n);for(let i=0;i<n;i++){
+  const x=g.start+i*g.step+g.w/2;
+  // Signes inversés : les faces des cartes extérieures regardent vers le centre (10° max).
+  const yaw=(g.center===0)?0:(i-g.center)/g.center*(Math.PI/18);
+  drawYawCard(ctx,scene.cards[i].img,x,g.baseline-5,g.w,g.h,yaw);
+ }}
+}
+function refresh(){const n=scene.cards.length;$('groupCounter').textContent=n+' / 10';$('groupExport').disabled=n===0;$('groupClear').disabled=n===0;
+ const list=$('groupList');list.replaceChildren();if(!n){const empty=document.createElement('div');empty.className='group-empty-list';empty.textContent='Les cartes importées apparaîtront ici.';list.appendChild(empty)}
+ scene.cards.forEach((item,i)=>{const node=document.createElement('div');node.className='group-item';node.draggable=true;node.dataset.index=String(i);node._card=item;
+ const grip=document.createElement('span');grip.className='group-grip';grip.textContent='⠿';
+ const thumb=document.createElement('img');thumb.className='group-thumb';thumb.src=item.url;thumb.alt='';
+ const details=document.createElement('div');details.style.minWidth='0';const name=document.createElement('div');name.className='group-item-name';name.textContent=item.name;name.title=item.name;const order=document.createElement('div');order.className='group-item-order';order.textContent='Carte '+(i+1);details.append(name,order);
+ const buttons=document.createElement('div');buttons.className='group-buttons';[['←',()=>move(i,i-1),i===0,'Déplacer vers la gauche'],['→',()=>move(i,i+1),i===n-1,'Déplacer vers la droite'],['×',()=>remove(i),false,'Supprimer cette carte']].forEach(([label,fn,disabled,title])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.title=title;b.setAttribute('aria-label',title);b.className='group-mini-btn'+(label==='×'?' group-remove':'');b.disabled=disabled;b.addEventListener('click',fn);buttons.appendChild(b)});
+ node.append(grip,thumb,details,buttons);
+ node.addEventListener('dragstart',e=>{
+  activeItem=node;scene.dragging=i;list.classList.add('sorting');
+  e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','group-card');
+  // Le navigateur montre une véritable miniature flottante sous le curseur.
+  const ghost=node.cloneNode(true);ghost.classList.add('drag-ghost');ghost.style.position='fixed';ghost.style.left='-9999px';ghost.style.top='0';ghost.style.width=node.offsetWidth+'px';document.body.appendChild(ghost);
+  e.dataTransfer.setDragImage(ghost,node.offsetWidth/2,35);setTimeout(()=>ghost.remove(),0);
+  requestAnimationFrame(()=>node.classList.add('is-dragging'));
+ });
+ node.addEventListener('dragend',()=>finishSort());
+ list.appendChild(node)});redraw();}
+
+// Tri instantané, avec déplacement réel des vignettes et animation des autres cartes.
+let activeItem=null;
+const orderList=$('groupList');
+function animateReflow(mutate){
+ const nodes=[...orderList.querySelectorAll('.group-item')];
+ const before=new Map(nodes.map(el=>[el,el.getBoundingClientRect()]));
+ mutate();
+ for(const el of nodes){if(el===activeItem)continue;const after=el.getBoundingClientRect(),old=before.get(el);if(!old)continue;
+  const deltaX=old.left-after.left;if(Math.abs(deltaX)<1)continue;
+  el.animate([{transform:`translateX(${deltaX}px)`},{transform:'translateX(0)'}],{duration:190,easing:'cubic-bezier(.2,.8,.2,1)'});
+ }
+}
+function syncSort(){
+ scene.cards=[...orderList.querySelectorAll('.group-item')].map(el=>el._card);
+ [...orderList.querySelectorAll('.group-item')].forEach((el,i)=>{el.dataset.index=String(i);const num=el.querySelector('.group-item-order');if(num)num.textContent='Carte '+(i+1)});
+ redraw();
+}
+function finishSort(){if(!activeItem)return;
+ activeItem.classList.remove('is-dragging');orderList.classList.remove('sorting');
+ activeItem=null;scene.dragging=null;syncSort();refresh();
+}
+orderList.addEventListener('dragover',e=>{
+ if(!activeItem)return;e.preventDefault();e.dataTransfer.dropEffect='move';
+ const target=e.target.closest('.group-item');if(!target||target===activeItem)return;
+ const box=target.getBoundingClientRect();const after=e.clientX>box.left+box.width/2;
+ const next=after?target.nextElementSibling:target;
+ if(next===activeItem||activeItem.nextElementSibling===next)return;
+ animateReflow(()=>orderList.insertBefore(activeItem,next));syncSort();
+ // Si la liste défile, la carte suivra la zone sous le pointeur.
+});
+orderList.addEventListener('drop',e=>{if(!activeItem)return;e.preventDefault();e.stopPropagation();finishSort()});
+orderList.addEventListener('dragenter',e=>{if(activeItem)e.preventDefault()});
+
+function move(from,to){if(to<0||to>=scene.cards.length)return;const [card]=scene.cards.splice(from,1);scene.cards.splice(to,0,card);refresh()}
+function remove(i){const [card]=scene.cards.splice(i,1);if(card)URL.revokeObjectURL(card.url);refresh()}
+function decodeImage(file){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file);const img=new Image();img.onload=()=>resolve({img,url,name:file.name});img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Image illisible : '+file.name))};img.src=url})}
+async function addFiles(files){const images=Array.from(files).filter(f=>f.type.startsWith('image/'));if(!images.length){$('groupImportMessage').textContent='Veuillez sélectionner des images.';return}const room=10-scene.cards.length;if(room<=0){$('groupImportMessage').textContent='Limite de 10 cartes atteinte.';return}const accepted=images.slice(0,room);let errors=0;for(const file of accepted){try{const item=await decodeImage(file);scene.cards.push(item)}catch{errors++}}$('groupImportMessage').textContent=(images.length>room?'Limite de 10 cartes : certaines images ont été ignorées. ': '')+(errors?errors+' image(s) impossible(s) à lire.':'');refresh()}
+const drop=$('groupDrop');drop.addEventListener('click',()=>$('groupUpload').click());drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('groupUpload').click()}});for(const event of ['dragenter','dragover'])drop.addEventListener(event,e=>{e.preventDefault();drop.classList.add('over')});for(const event of ['dragleave','drop'])drop.addEventListener(event,e=>{e.preventDefault();drop.classList.remove('over')});drop.addEventListener('drop',e=>{addFiles(e.dataTransfer.files)});$('groupUpload').addEventListener('change',e=>{addFiles(e.target.files);e.target.value=''});
+function refreshHall(){
+ updateHallSizeControl();
+ $('hofCounter').textContent=scene.hof.length+' / 5';
+ const list=$('hofList');list.replaceChildren();
+ scene.hof.forEach((entry,i)=>{const item=document.createElement('div');item.className='hof-item';
+ const image=document.createElement('img');image.src=entry.url;image.alt='';
+ const filename=document.createElement('small');filename.textContent=entry.name;filename.title=entry.name;
+ const remove=document.createElement('button');remove.type='button';remove.textContent='Retirer';remove.setAttribute('aria-label','Retirer '+entry.name);
+ remove.addEventListener('click',()=>{const [removed]=scene.hof.splice(i,1);URL.revokeObjectURL(removed.url);refreshHall()});
+ item.append(image,filename,remove);list.appendChild(item)});
+ redraw();
+}
+async function addHall(files){const images=Array.from(files).filter(f=>f.type.startsWith('image/'));
+ const count=Math.max(0,5-scene.hof.length);let fails=0;
+ for(const file of images.slice(0,count)){try{scene.hof.push(await decodeImage(file))}catch{fails++}}
+ $('hofStatus').textContent=images.length>count?'Maximum de cinq cartes.':fails?'Impossible de lire certaines images.':'';
+ refreshHall();
+}
+$('hofSize').addEventListener('input',()=>{$('hofSizeOut').textContent=$('hofSize').value+' px';redraw()});
+const hofDrop=$('hofDrop');
+hofDrop.addEventListener('click',()=>$('hofUpload').click());
+hofDrop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('hofUpload').click()}});
+for(const name of ['dragenter','dragover'])hofDrop.addEventListener(name,e=>{e.preventDefault();e.stopPropagation();hofDrop.classList.add('over')});
+for(const name of ['dragleave','drop'])hofDrop.addEventListener(name,e=>{e.preventDefault();e.stopPropagation();hofDrop.classList.remove('over')});
+hofDrop.addEventListener('drop',e=>addHall(e.dataTransfer.files));
+$('hofUpload').addEventListener('change',e=>{addHall(e.target.files);e.target.value='' });
+refreshHall();
+$('groupClear').addEventListener('click',()=>{scene.cards.forEach(c=>URL.revokeObjectURL(c.url));scene.cards=[];refresh()});
+$('groupBackgroundButton').addEventListener('click',()=>$('groupBackgroundInput').click());$('groupBackgroundInput').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const entry=await decodeImage(file);scene.background=entry.img;scene.urls.push(entry.url);$('groupBackgroundStatus').textContent='Décor personnalisé chargé';$('groupBackgroundDetail').textContent=file.name;redraw()}catch{$('groupBackgroundStatus').textContent='Impossible de lire ce fichier'}e.target.value=''});
+$('groupExport').addEventListener('click',async()=>{if(document.fonts){try{await document.fonts.load('600 67px "Ted Next Semibold"')}catch{}}if(scene.cards.length===0)return;const status=$('groupExportStatus');status.textContent='Préparation du PNG…';try{redraw();cvs.toBlob(blob=>{if(!blob){status.textContent='Impossible de générer le PNG.';return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='fond-ecran-groupe-'+scene.cards.length+'-cartes-3840x1914.png';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);status.textContent='Exportation PNG lancée.'},'image/png')}catch{status.textContent='Exportation impossible. Chargez le fond depuis un fichier local et réessayez.'}});
+refresh();loadBackground();
+})();
+</script>
+<script>
+(()=>{
+ const button=document.getElementById('downloadAiGuide');
+ const status=document.getElementById('guideStatus');
+ button.addEventListener('click',async(e)=>{
+  e.preventDefault();
+  status.textContent='Préparation du téléchargement…';
+  try{
+   const response=await fetch(button.href);
+   if(!response.ok)throw new Error('Téléchargement indisponible');
+   const blob=await response.blob();
+   const url=URL.createObjectURL(new Blob([blob],{type:'application/pdf'}));
+   const a=document.createElement('a');a.href=url;a.download='Guide-IA-cartes-individuelles.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+   status.textContent='Téléchargement lancé.';
+  }catch(err){status.textContent='Le guide va s’ouvrir dans un nouvel onglet; vous pourrez l’enregistrer.';window.open(button.href,'_blank','noopener,noreferrer')|| (location.href=button.href);}
+ });
+ const copy=document.getElementById('copyUniform');
+ copy.addEventListener('click',async()=>{try{await navigator.clipboard.writeText('Uniforme #4');copy.textContent='Copié !';}catch(e){copy.textContent='Sélectionnez le texte';}setTimeout(()=>copy.textContent='Copier',1800)});
+})();
+</script>
+<script>
+// Onglets de navigation globaux indépendants du générateur de cartes.
+(()=>{
+ const tabs=Array.from(document.querySelectorAll('.global-tab'));
+ const panels={personnage:document.getElementById('panel-personnage'),carte:document.getElementById('panel-carte'),groupe:document.getElementById('panel-groupe'),chrome:document.getElementById('panel-chrome')};
+ function activate(tab,focus=false){
+  for(const t of tabs){const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;panels[t.dataset.tab].hidden=!active;}
+  if(focus)tab.focus();
+ }
+ for(const [i,tab] of tabs.entries()){
+  tab.addEventListener('click',()=>activate(tab));
+  tab.addEventListener('keydown',e=>{let next=-1;if(e.key==='ArrowRight')next=(i+1)%tabs.length;if(e.key==='ArrowLeft')next=(i+tabs.length-1)%tabs.length;if(e.key==='Home')next=0;if(e.key==='End')next=tabs.length-1;if(next>=0){e.preventDefault();activate(tabs[next],true);}});
+ }
+})();
+</script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id), canvas=$('preview'),ctx=canvas.getContext('2d'),state={img:null,zoom:100,x:0,y:0,style:'baseball'};
+const W=1000,H=1400;
+const themes={
+ rogers:{accent:'#DA291C',second:'#DA291C',job:'#1A1A1A',paper:'#FFFFFF',mat:'#FFFFFF',soft:'#F1F2F2',dark:'#000000',colors:['#DA291C','#FFFFFF','#F1F2F2','#1A1A1A','#000000']},
+ fido:{accent:'#00AFAB',second:'#FFE600',job:'#000000',paper:'#F0F0F0',mat:'#FFFFFF',soft:'#CDD1D4',dark:'#000000',colors:['#FFE600','#FFFFFF','#00AFAB','#000000','#CDD1D4','#F0F0F0']},
+ chatr:{accent:'#542E91',second:'#EA9500',job:'#542E91',paper:'#FFFFFF',mat:'#FFFFFF',soft:'#F5F0FF',dark:'#25163f',colors:['#542E91','#EA9500','#FFFFFF']}
+};
+let theme=themes.rogers;
+const FRAME_SLOPE=(1080-1200)/(950-50);
+const NAME_FONT='"Oh Chewy Custom", "Brush Script MT", "Segoe Script", cursive';
+const JOB_FONT='"Gill Sans Custom", "Gill Sans", "Arial Narrow", sans-serif';
+
+function applyTheme(){theme=themes[$('theme').value]||themes.rogers;document.documentElement.style.setProperty('--accent',theme.accent);const sc=$('swatches');sc.replaceChildren();for(const color of theme.colors){const dot=document.createElement('span');dot.style.background=color;dot.title=color;sc.appendChild(dot)}update();}
+function roundedCard(c){c.beginPath();c.roundRect(0,0,W,H,43)}
+function paperBase(c){const paper=c.createLinearGradient(0,0,W,H);paper.addColorStop(0,theme.paper);paper.addColorStop(.58,theme.paper);paper.addColorStop(1,theme.paper);c.fillStyle=paper;c.fillRect(0,0,W,H)}
+function addPaperTexture(c){c.save();c.globalAlpha=.27;c.fillStyle=c.createPattern(grain,'repeat');c.fillRect(0,0,W,H);c.restore()}
+function cardShell(c){c.save();roundedCard(c);c.clip();paperBase(c);addPaperTexture(c);c.restore();c.save();c.lineWidth=11;c.strokeStyle='rgba(255,255,255,.88)';c.shadowColor='rgba(255,255,255,.95)';c.shadowBlur=15;roundedCard(c);c.stroke();c.restore();c.save();c.lineWidth=3;c.strokeStyle='rgba(88,78,74,.22)';roundedCard(c);c.stroke();c.restore();}
+function framePath(c,left,top,right,bottomLeft,bottomRight,r){c.beginPath();c.moveTo(left+r,top);c.lineTo(right-r,top);c.quadraticCurveTo(right,top,right,top+r);c.lineTo(right,bottomRight-r*.78);c.quadraticCurveTo(right,bottomRight,right-r*.83,bottomRight+r*.12);c.lineTo(left+r*.83,bottomLeft-r*.12);c.quadraticCurveTo(left,bottomLeft,left,bottomLeft-r);c.lineTo(left,top+r);c.quadraticCurveTo(left,top,left+r,top);c.closePath();}
+function fontFit(c,text,maxWidth,initial,min,font){let sz=initial;while(sz>min){c.font=`${sz}px ${font}`;if(c.measureText(text).width<=maxWidth)break;sz-=2}return sz}
+function skewToFrame(c,x,y){c.translate(x,y);c.transform(1,FRAME_SLOPE,0,1,0,0)}
+function fitNameSize(c,text,maxWidth,initial,pct){let size=initial;while(size>24){c.font=`${size}px ${NAME_FONT}`;if(c.measureText(text).width+size*.22<=maxWidth)break;size-=1}return Math.max(20,size*pct)}
+function drawPlaceholder(c,x,y,w,h,r=0){c.save();if(r>0){c.beginPath();c.roundRect(x,y,w,h,r);c.clip()}const g=c.createLinearGradient(x,y,x+w,y+h);g.addColorStop(0,'#36485a');g.addColorStop(1,'#8a919b');c.fillStyle=g;c.fillRect(x,y,w,h);c.fillStyle='#ffffffd9';c.textAlign='center';c.font='600 28px system-ui, sans-serif';c.fillText('Importez une photo',x+w/2,y+h/2-10);c.font='500 20px system-ui, sans-serif';c.fillText('pour commencer',x+w/2,y+h/2+22);c.restore()}
+function drawPhotoRect(c,x,y,w,h,r=0){c.save();if(r>0){c.beginPath();c.roundRect(x,y,w,h,r);c.clip()} else {c.beginPath();c.rect(x,y,w,h);c.clip()}
+ if(state.img){const img=state.img,iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;baseDraw(c,img,iw,ih,x,y,w,h)} else drawPlaceholder(c,x,y,w,h,r);c.restore();}
+function drawPhotoPath(c,pathFunc,x,y,w,h){c.save();pathFunc();c.clip();if(state.img){const img=state.img,iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;baseDraw(c,img,iw,ih,x,y,w,h)} else drawPlaceholder(c,x,y,w,h,12);c.restore();}
+function baseDraw(c,img,iw,ih,x,y,w,h){const base=Math.max(w/iw,h/ih),f=base*state.zoom/100,dw=iw*f,dh=ih*f;const dx=x+(w-dw)/2+(state.x/100)*Math.max(0,(dw-w)/2);const dy=y+(h-dh)/2+(state.y/100)*Math.max(0,(dh-h)/2);c.drawImage(img,dx,dy,dw,dh)}
+function photoSurplus(targetW,targetH){if(!state.img)return {x:0,y:0};const iw=state.img.naturalWidth,ih=state.img.naturalHeight,base=Math.max(targetW/iw,targetH/ih)*state.zoom/100;return {x:Math.max(0,(iw*base-targetW)/2),y:Math.max(0,(ih*base-targetH)/2)};}
+function commonText(){return {name:($('employee').value.trim()||'Prénom'),post:($('position').value.trim()||"Poste de l'employé"),pct:(+$('nameSize').value/100),offsetY:+$('nameVertical').value};}
+const grain=document.createElement('canvas');grain.width=260;grain.height=364;const gc=grain.getContext('2d'),gi=gc.createImageData(grain.width,grain.height);let rng=743812;for(let i=0;i<gi.data.length;i+=4){rng=(rng*1664525+1013904223)>>>0;let n=(rng>>>24);gi.data[i]=n;gi.data[i+1]=n;gi.data[i+2]=n;gi.data[i+3]=Math.round(7+(n/255)*16)}gc.putImageData(gi,0,0);
+
+function renderBaseball(c){const {name,post,pct,offsetY}=commonText();
+ c.save();roundedCard(c);c.clip();paperBase(c);addPaperTexture(c);
+ c.save();c.shadowColor='rgba(60,15,12,.22)';c.shadowBlur=15;c.shadowOffsetY=6;framePath(c,50,50,950,1200,1080,17);c.fillStyle=theme.accent;c.fill();c.restore();
+ c.save();c.lineWidth=3;c.strokeStyle='rgba(255,255,255,.62)';framePath(c,51.5,51.5,948.5,1198,1079,16);c.stroke();c.restore();
+ c.save();c.shadowColor='rgba(80,20,12,.22)';c.shadowBlur=7;c.shadowOffsetY=3;framePath(c,80,80,920,1169,1049,12);c.fillStyle=theme.mat;c.fill();c.restore();
+ c.save();framePath(c,98,98,902,1149,1030,9);c.clip();drawPhotoRect(c,98,98,804,1051,0);c.restore();
+ c.save();c.lineWidth=3;c.strokeStyle='rgba(255,255,255,.78)';framePath(c,98,98,902,1149,1030,9);c.stroke();c.restore();
+ c.save();skewToFrame(c,500,1136+offsetY);c.textAlign='center';c.textBaseline='middle';const fs=fitNameSize(c,name,830,190,pct);c.font=`${fs}px ${NAME_FONT}`;c.lineJoin='round';c.strokeStyle=theme.accent;c.lineWidth=Math.max(9,fs*.15);c.shadowColor='rgba(30,10,9,.2)';c.shadowBlur=5;c.shadowOffsetY=4;c.strokeText(name,0,0);c.shadowColor='transparent';c.fillStyle='#fff';c.fillText(name,0,0);c.restore();
+ c.save();skewToFrame(c,510,1270);c.textAlign='center';c.textBaseline='middle';const upper=post.toLocaleUpperCase('fr-CA'),sz=fontFit(c,upper,790,64,18,JOB_FONT);c.font=`${sz}px ${JOB_FONT}`;c.fillStyle=theme.job;c.fillText(upper,0,0);c.restore();
+ c.restore();
+}
+// ÉDITORIAL — composition imprimée élégante, deux détails de couleur maîtrisés.
+function renderEditorial(c){
+ const {name,post,pct,offsetY}=commonText();
+ const titleFont='"Mystical Spring Custom", Georgia, serif';
+ const subtitleFont='"Creato Display Custom", "Gill Sans", sans-serif';
+ c.save();roundedCard(c);c.clip();
+ c.fillStyle='#fbfaf7';c.fillRect(0,0,W,H);addPaperTexture(c);
+ // Une fine reliure colorée et son filet complémentaire.
+ c.fillStyle=theme.accent;c.fillRect(0,0,19,H);
+ c.fillStyle=theme.second;c.fillRect(19,0,5,H);
+ // Photographie large, sans cartouche ni encadrement massif.
+ drawPhotoRect(c,66,62,875,1005,19);
+ c.save();c.strokeStyle='rgba(25,25,25,.11)';c.lineWidth=2;c.beginPath();c.roundRect(66,62,875,1005,19);c.stroke();c.restore();
+ // Accent d'angle sous la photographie, repris sous les mentions.
+ c.fillStyle=theme.accent;c.beginPath();c.roundRect(66,1092,124,8,4);c.fill();
+ c.fillStyle=theme.second;c.beginPath();c.roundRect(199,1092,34,8,4);c.fill();
+ c.save();c.textAlign='left';c.textBaseline='middle';
+ const fs=fitNameSize(c,name,850,149,pct,titleFont);
+ c.font=`${fs}px ${titleFont}`;c.fillStyle='#1d1c1b';c.fillText(name,67,1186+offsetY);c.restore();
+ c.save();const upper=post.toLocaleUpperCase('fr-CA');const sz=fontFit(c,upper,830,46,18,subtitleFont);
+ c.textAlign='left';c.textBaseline='middle';c.font=`${sz}px ${subtitleFont}`;c.fillStyle='#4a4a49';c.fillText(upper,70,1308);c.restore();
+ // Trait de fermeture aligné avec la grille typographique.
+ c.fillStyle=theme.accent;c.fillRect(66,1360,710,4);
+ c.fillStyle=theme.second;c.fillRect(788,1360,154,4);
+ c.restore();
+}
+// SIGNATURE — photographie sur toute la carte, sans cadre ni panneaux.
+function renderSignature(c){
+ const {name,post,pct,offsetY}=commonText();
+ const titleFont='"Erbaum Bold Custom", "Arial Black", sans-serif';
+ const subtitleFont='"Bebas Neue Custom", Impact, sans-serif';
+ c.save();roundedCard(c);c.clip();
+ drawPhotoRect(c,0,0,W,H,0);
+ // Dégradé profond, semi-transparent, laissant la photo visible.
+ const overlay=c.createLinearGradient(0,710,0,H);
+ overlay.addColorStop(0,'rgba(0,0,0,0)');
+ overlay.addColorStop(.29,'rgba(0,0,0,.24)');
+ overlay.addColorStop(.68,'rgba(0,0,0,.55)');
+ overlay.addColorStop(1,'rgba(0,0,0,.78)');
+ c.fillStyle=overlay;c.fillRect(0,690,W,H-690);
+ // Repère de couleur discret, sans logo ni nom de marque.
+ c.fillStyle=theme.accent;c.beginPath();c.roundRect(76,1055,118,10,5);c.fill();
+ c.fillStyle=theme.second;c.beginPath();c.roundRect(201,1055,39,10,5);c.fill();
+ c.save();c.textAlign='left';c.textBaseline='middle';const fs=fitNameSize(c,name,854,122,pct,titleFont);
+ c.font=`${fs}px ${titleFont}`;c.fillStyle='#fff';
+ c.shadowColor='rgba(0,0,0,.26)';c.shadowBlur=8;c.shadowOffsetY=3;
+ c.fillText(name,74,1167+offsetY);c.restore();
+ c.save();const upper=post.toLocaleUpperCase('fr-CA');const sz=fontFit(c,upper,840,61,20,subtitleFont);
+ c.textAlign='left';c.textBaseline='middle';c.font=`${sz}px ${subtitleFont}`;c.fillStyle='rgba(255,255,255,.95)';c.fillText(upper,78,1274);c.restore();
+ c.fillStyle=theme.accent;c.beginPath();c.roundRect(76,1343,848,5,2);c.fill();
+ c.restore();
+}
+
+function render(c,w){const s=w/W;c.setTransform(s,0,0,s,0,0);c.clearRect(0,0,W,H);c.save();roundedCard(c);c.clip();if(state.style!=='signature')cardShell(c);switch(state.style){case 'editorial':renderEditorial(c);break;case 'signature':renderSignature(c);break;default:renderBaseball(c);break;}c.restore();c.setTransform(1,0,0,1,0,0);}
+function update(){state.zoom=+$('zoom').value;state.x=+$('x').value;state.y=+$('y').value;state.style=(document.querySelector('input[name="style"]:checked')||{value:'baseball'}).value;$('zoomOut').textContent=state.zoom+' %';$('xOut').textContent=state.x+' %';$('yOut').textContent=state.y+' %';$('nameSizeOut').textContent=$('nameSize').value+' %';$('nameVerticalOut').textContent=(+$('nameVertical').value>0?'+':'')+$('nameVertical').value+' px';render(ctx,W)}
+for(const id of ['employee','position','nameSize','nameVertical','zoom','x','y'])$(id).addEventListener('input',update);
+// Ne vider que les valeurs initiales et seulement à la première interaction.
+for(const [id,initial] of [['employee','Prénom'],['position',"Poste de l'employé"]]){
+ const field=$(id);let touched=false;
+ field.addEventListener('focus',()=>{if(!touched && field.value===initial){field.value='';update();}touched=true;});
+ field.addEventListener('input',()=>{touched=true;});
+}
+$('theme').addEventListener('change',applyTheme);
+document.querySelectorAll('input[name="style"]').forEach(r=>r.addEventListener('change',update));
+$('reset').addEventListener('click',()=>{$('zoom').value=100;$('x').value=0;$('y').value=0;update()});
+function load(file){if(!file)return;if(!file.type.startsWith('image/')){alert('Veuillez choisir un fichier image.');return;}const url=URL.createObjectURL(file),img=new Image();img.onload=()=>{state.img=img;$('zoom').value=100;$('x').value=0;$('y').value=0;$('fileName').textContent='Photo : '+file.name;$('export').disabled=false;update();URL.revokeObjectURL(url)};img.onerror=()=>{URL.revokeObjectURL(url);alert('Impossible de lire cette image.')};img.src=url}
+$('upload').addEventListener('change',e=>{load(e.target.files[0]);e.target.value=''});
+const drop=$('drop');drop.addEventListener('click',()=>$('upload').click());drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('upload').click()}});for(const evt of ['dragenter','dragover'])drop.addEventListener(evt,e=>{e.preventDefault();drop.classList.add('over')});for(const evt of ['dragleave','drop'])drop.addEventListener(evt,e=>{e.preventDefault();drop.classList.remove('over')});drop.addEventListener('drop',e=>load([...e.dataTransfer.files].find(f=>f.type.startsWith('image/'))));
+let drag=null;canvas.style.touchAction='none';canvas.style.cursor='grab';canvas.addEventListener('pointerdown',e=>{if(!state.img)return;drag={cx:e.clientX,cy:e.clientY,x:state.x,y:state.y};canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});canvas.addEventListener('pointermove',e=>{if(!drag)return;const rect=canvas.getBoundingClientRect();const dx=(e.clientX-drag.cx)*(W/rect.width),dy=(e.clientY-drag.cy)*(H/rect.height);const target={baseball:[804,1051],editorial:[875,1005],signature:[1000,1400]}[state.style]||[804,1051];const surplus=photoSurplus(target[0],target[1]);if(surplus.x>0)$('x').value=Math.max(-100,Math.min(100,drag.x+dx/surplus.x*100));if(surplus.y>0)$('y').value=Math.max(-100,Math.min(100,drag.y+dy/surplus.y*100));update()});for(const ev of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(ev,()=>{drag=null;canvas.style.cursor='grab'});
+$('export').addEventListener('click',async()=>{if(!state.img)return;if(document.fonts){await Promise.race([Promise.allSettled([document.fonts.load('80px "Oh Chewy Custom"'),document.fonts.load('60px "Gill Sans Custom"'),document.fonts.load('100px "Mystical Spring Custom"'),document.fonts.load('60px "Creato Display Custom"'),document.fonts.load('100px "Erbaum Bold Custom"'),document.fonts.load('60px "Bebas Neue Custom"')]),new Promise(resolve=>setTimeout(resolve,4500))]);}const width=+$('resolution').value,off=document.createElement('canvas');off.width=width;off.height=width*7/5;const c=off.getContext('2d');render(c,width);off.toBlob(blob=>{if(!blob){alert('Échec de l’exportation.');return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='carte-'+(($('employee').value||'employe').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'-').replace(/^-|-$/g,'').toLowerCase())+'-'+$('theme').value+'-'+state.style+'-'+width+'x'+off.height+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)},'image/png')});
+applyTheme();if(document.fonts){Promise.allSettled([document.fonts.load('80px "Oh Chewy Custom"'),document.fonts.load('60px "Gill Sans Custom"'),document.fonts.load('100px "Mystical Spring Custom"'),document.fonts.load('60px "Creato Display Custom"'),document.fonts.load('100px "Erbaum Bold Custom"'),document.fonts.load('60px "Bebas Neue Custom"')]).then(update);}else{update();}
+})();
+</script>
+</body>
+</html>
